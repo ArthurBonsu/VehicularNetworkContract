@@ -6,11 +6,7 @@ pragma solidity 0.8.2;
 
 contract VehicleContract 
  {
-
-   address public gnosissafeownerhere;
-
-   
-         
+        
         struct Vehicle {      
         address  vehicleaddress;  
         string  vehiclename;
@@ -20,7 +16,6 @@ contract VehicleContract
         bool active;      
       }
          
-
    
       Vehicle vehiclenode;
       Vehicle[] public vehiclestore;
@@ -29,44 +24,51 @@ contract VehicleContract
 
 
 mapping(address => address) public registeredentitiesasddress;
-mapping(address =>  string ) public  registeredentitiespseudonymlist;
+mapping(string =>  string ) public  registeredentitiespseudonymlist;
 mapping(address =>  string ) public  revokedlist;
 mapping(address =>  string ) public  prevrevokedlist;
  mapping(address => Vehicle) public vehiclelist;
 
+ string[] alladdresses;
+ string[] allpseudonymstring;
 
 event registrationevent(address indexed vehicleaddress, string indexed  vehiclename, string indexed  cartype);
 
-event GetVehicleDetailViaAddressEvent(address indexed _myvehicleaddress,   string indexed myvehiclename, string indexed mycartype, uint256  indexed proposalindex, string indexed pseudorandomnum,  string indexed active );
-event GetVehicleDetailViaPseudonymnEvent(address indexed _myvehicleaddress,   string indexed myvehiclename, string indexed mycartype, uint256  indexed proposalindex, string indexed pseudorandomnum,  string indexed active);
+event GetVehicleDetailViaAddressEvent(address  _myvehicleaddress,   string  _myvehiclename, string  mycartype, uint256  _proposalindex, string  _pseudorandomnum,  bool _active );
+event GetAllPseudonymAddressEvent (address[] indexed allpseudonymnstrings);
 event GetAllAddressesEvent(address[] indexed vehicleaddresses);
 
 
 
-    function Registration (address _vehicleaddress, string _vehiclename, string _cartype ) external returns (address _thevehicleaddress, string memory fibonaccistring  ) {
+    function Registration (address _vehicleaddress, string memory _vehiclename, string memory _cartype ) external returns (address, string memory  ) {
       uint256 index=0;
       
       // We set it amoong the registered hashmaps
       registeredentitiesasddress[_vehicleaddress]=_vehicleaddress;
      
      // We design a fabonacci algorithm to create a pseudonym
-     bytes memory fibonacci = abi.encodePacked(_vehicleaddress);
-     string memory fibonaccistring = bytesToString(fibonacci);
+     //bytes memory  fibonacci = abi.encodePacked(_vehicleaddress);
+     string memory  fibonaccistring = "placeholder";
    
     // multiwalletlist.push ([addressstring,safestring]);
  
 
    //  listofownersafe = OwnerSafeHere(walletaddress,safestring );
       // We store the vehicle nodes on the blockchain and set it as registered with details
-     vehiclestore.push(_vehicleaddress);
-     vehiclestore[_vehicleaddress].vehicleaddress=_vehicleaddress;
-     vehiclestore[_vehicleaddress].vehiclename=_vehiclename;
-     vehiclestore[_vehicleaddress].cartype=_cartype;
-     vehiclestore[_vehicleaddress].pseudorandomnum=fibonaccistring;
-     vehiclestore[_vehicleaddress].active= true;
-    
+   
+  
+    vehiclenode =Vehicle(_vehicleaddress,_vehiclename, _cartype,index,fibonaccistring, true );
+     vehiclelist[_vehicleaddress].vehicleaddress=_vehicleaddress;
+     vehiclelist[_vehicleaddress].vehiclename=_vehiclename;
+     vehiclelist[_vehicleaddress].cartype=_cartype;
+      vehiclelist[_vehicleaddress].proposalindex=index;
+     vehiclelist[_vehicleaddress].pseudorandomnum=fibonaccistring;
+     vehiclelist[_vehicleaddress].active= true;
+      alladdresses.push(_vehicleaddress);
+      allpseudonymstring.push (fibonaccistring);
+     vehiclestore.push(vehiclenode);
     // We store the pseudorandom value as well
-    registeredentitiespseudonymlist[_vehicleaddress] = fibonaccistring;
+    registeredentitiespseudonymlist[fibonaccistring] = fibonaccistring;
       
 
       // Events logged on the blockchain
@@ -79,17 +81,17 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
    
     }
 
-function GetVehicleDetailViaAddress  (address _vehicleaddress) external returns ( address _myvehicleaddress,   string myvehiclename, string mycartype, uint256  proposalindex, string pseudorandomnum,  string active ) {
+function GetVehicleDetailViaAddress  (address _vehicleaddress) external returns ( address _myvehicleaddress,   string memory _myvehiclename, string memory  _mycartype, uint256  _proposalindex, string memory _pseudorandomnum,  bool  _active ) {
  
        require (registeredentitiesasddress[_vehicleaddress]==_vehicleaddress,  "Address is not registered, try registering");
    
-   address myvehicleaddress = vehiclestore[_vehicleaddress].vehicleaddress;
-    string myvehiclename = vehiclestore[_vehicleaddress].vehiclename;
-    string mycartype = vehiclestore[_vehicleaddress].cartype;
-     uint256  proposalindex=  vehiclestore[_vehicleaddress].proposalindex;
-    string pseudorandomnum= vehiclestore[_vehicleaddress].pseudorandomnum;
+   address  myvehicleaddress = vehiclelist[_vehicleaddress].vehicleaddress;
+    string memory myvehiclename = vehiclelist[_vehicleaddress].vehiclename;
+    string memory mycartype = vehiclelist[_vehicleaddress].cartype;
+     uint256  proposalindex=  vehiclelist[_vehicleaddress].proposalindex;
+    string memory pseudorandomnum= vehiclelist[_vehicleaddress].pseudorandomnum;
   
-    string active= vehiclestore[_vehicleaddress].active;
+   bool active= vehiclelist[_vehicleaddress].active;
 
       emit GetVehicleDetailViaAddressEvent(myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
  
@@ -98,32 +100,13 @@ function GetVehicleDetailViaAddress  (address _vehicleaddress) external returns 
    
    
     }
-function GetVehicleDetailViaPseudonymn  (address _vehicleaddreess, address _pseudorandomnum) external returns ( address _myvehicleaddress,   string myvehiclename, string mycartype, uint256  proposalindex, string pseudorandomnum,  string active  ) {
-  
-               require (registeredentitiespseudonymlist[_vehicleaddreess]==_pseudorandomnum,  "Address is not registered, try registering");
-   
-   address myvehicleaddress = vehiclestore[_vehicleaddress].vehicleaddress;
-    string myvehiclename = vehiclestore[_vehicleaddress].vehiclename;
-    string mycartype = vehiclestore[_vehicleaddress].cartype;
-     uint256  proposalindex=  vehiclestore[_vehicleaddress].proposalindex;
-    string pseudorandomnum= vehiclestore[_vehicleaddress].pseudorandomnum;
-  
-    string active= vehiclestore[_vehicleaddress].active;
 
-      emit GetVehicleDetailViaPseudonymnEvent(myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
- 
-      
-    return (myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
- 
-  
-   
-   
-    }
 
-function GetAllRegisteredAddress () external returns (address[] vehicleaddresses) {
-   address[] alladdresses =  registeredentitiesasddress;
 
-             
+function GetAllRegisteredAddress () external returns (address memory vehicleaddresses) {
+   address[]  alladdresses =  registeredentitiesasddress;
+
+          
       emit GetAllAddressesEvent(alladdresses);
  
       
@@ -133,14 +116,12 @@ function GetAllRegisteredAddress () external returns (address[] vehicleaddresses
    
    
     }
-function GetAllPseudonymAddress () external returns (address[] vehicleaddresses) {
-   address[] pseudonym =  registeredentitiesasddress;
-
-             
-      emit GetAllPseudonymEvent(alladdresses);
- 
+function GetAllPseudonymAddress () external returns (address[] calldata allpseudonymnstrings) {
+   address[] calldata pseudonym =  registeredentitiesasddress;
+        
+  emit  GetAllPseudonymAddressEvent  (pseudonym);
       
-    return (alladdresses);
+    return (pseudonym);
  
      }
 
@@ -155,13 +136,82 @@ function CheckIfVehicleExistsViaAddress  (address _vehicleaddreess) external ret
    
    
     }
-function CheckIfVehicleExistsViaPseudonym  (string _pseudorandomnum) external returns (bool existent ) {
-      require (registeredentitiespseudonymlist[_vehicleaddreess]==_pseudorandomnum,  "Address is not registered, try registering");
+function CheckIfVehicleExistsViaPseudonym  (string calldata _pseudorandomnum) external returns (bool existent ) {
+     
+    require (registeredentitiespseudonymlist[_pseudorandomnum]==_pseudorandomnum,  "Address is not registered, try registering");
     bool  _existent = true;   
       
     return (_existent);
    
    
     }
+ function compare(string memory _a, string memory _b) public returns (int) {
+        bytes memory a = bytes(_a);
+        bytes memory b = bytes(_b);
+        uint minLength = a.length;
+        if (b.length < minLength) minLength = b.length;
+       
+        for (uint i = 0; i < minLength; i ++)
+            if (a[i] < b[i])
+                return -1;
+            else if (a[i] > b[i])
+                return 1;
+        if (a.length < b.length)
+            return -1;
+        else if (a.length > b.length)
+            return 1;
+        else
+            return 0;
+    }
+  
+    function equal(string memory _a, string memory _b) public returns (bool) {
+        return compare(_a, _b) == 0;
+    }
 
+function bytesToString(bytes memory byteCode) public pure returns(string memory stringData)
+{
+    uint256 blank = 0; 
+    uint256 length = byteCode.length;
+
+    uint cycles = byteCode.length / 0x20;
+    uint requiredAlloc = length;
+
+    if (length % 0x20 > 0) //optimise copying the final part of the bytes - to avoid looping with single byte writes
+    {
+        cycles++;
+        requiredAlloc += 0x20; //expand memory to allow end blank, so we don't smack the next stack entry
+    }
+
+    stringData = new string(requiredAlloc);
+
+    //copy data in 32 byte blocks
+    assembly {
+        let cycle := 0
+
+        for
+        {
+            let mc := add(stringData, 0x20) //pointer into bytes we're writing to
+            let cc := add(byteCode, 0x20)   //pointer to where we're reading from
+        } lt(cycle, cycles) {
+            mc := add(mc, 0x20)
+            cc := add(cc, 0x20)
+            cycle := add(cycle, 0x01)
+        } {
+            mstore(mc, mload(cc))
+        }
+    }
+
+    //finally blank final bytes and shrink size (part of the optimisation to avoid looping adding blank bytes1)
+    if (length % 0x20 > 0)
+    {
+        uint offsetStart = 0x20 + length;
+        assembly
+        {
+            let mc := add(stringData, offsetStart)
+            mstore(mc, mload(add(blank, 0x20)))
+            //now shrink the memory back so the returned object is the correct size
+            mstore(stringData, length)
+        }
+    }
+}
 }
