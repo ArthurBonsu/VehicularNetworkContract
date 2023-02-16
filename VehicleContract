@@ -1,0 +1,286 @@
+// SPDX-License-Identifier: LGPL-3.0-only
+
+
+pragma solidity 0.8.2;
+
+
+contract VehicleContract
+ {
+
+   address public gnosissafeownerhere;
+
+   
+         
+        struct Vehicle {      
+        address  vehicleaddress;  
+        string  vehiclename;
+        string  cartype;
+        uint256  proposalindex;
+        string pseudorandomnum;
+        bool active;      
+      }
+         
+      VIPEntity vipperson;
+      VIPEntity[] public vipentitystore;
+      
+      Proposals proposalpost;
+      Proposals[] public proposalstore;
+
+      Vehicle vehiclenode;
+      Vehicle[] public vehiclestore;
+    //  string [][] public multiwalletlist ;
+    //  string[] public safeaddressarray;
+
+
+mapping(address => address) public registeredentitiesasddress;
+mapping(address =>  string ) public  registeredentitiespseudonymlist;
+mapping(address =>  string ) public  revokedlist;
+mapping(address =>  string ) public  prevrevokedlist;
+ mapping(address => Vehicle) public vehiclelist;
+
+
+event registrationevent(address indexed vehicleaddress, string indexed  vehiclename, string indexed  vehiclename);
+
+event GetVehicleDetailViaAddressEvent(address indexed _myvehicleaddress,   string indexed myvehiclename, string indexed mycartype, uint256  indexed proposalindex, string indexed pseudorandomnum,  string indexed active );
+event GetVehicleDetailViaPseudonymnEvent(address indexed _myvehicleaddress,   string indexed myvehiclename, string indexed mycartype, uint256  indexed proposalindex, string indexed pseudorandomnum,  string indexed active);
+event GetAllAddressesEvent(address[] indexed vehicleaddresses);
+
+
+
+    function Registration (address _vehicleaddress, string _vehiclename, string _cartype, ) external returns (address _vehicleaddress, string memory fibonaccistring  ) {
+      uint256 index=0;
+
+      // We set it amoong the registered hashmaps
+      registeredentitiesasddress[_vehicleaddress]=_vehicleaddress;
+     
+     // We design a fabonacci algorithm to create a pseudonym
+     bytes memory fibonacci = abi.encodePacked(_vehicleaddress);
+     string memory fibonaccistring = bytesToString(fibonacci);
+   
+    // multiwalletlist.push ([addressstring,safestring]);
+ 
+
+   //  listofownersafe = OwnerSafeHere(walletaddress,safestring );
+      // We store the vehicle nodes on the blockchain and set it as registered with details
+     vehiclestore.push(_vehicleaddress);
+     vehiclestore[_vehicleaddress].vehicleaddress=_vehicleaddress;
+     vehiclestore[_vehicleaddress].vehiclename=_vehiclename;
+     vehiclestore[_vehicleaddress].cartype=_cartype;
+     vehiclestore[_vehicleaddress].pseudorandomnum=fibonaccistring;
+     vehiclestore[_vehicleaddress].active= true;
+    
+    // We store the pseudorandom value as well
+    registeredentitiespseudonymlist[_vehicleaddress] = fibonaccistring;
+      
+
+      // Events logged on the blockchain
+      emit registrationevent( _vehicleaddress,   _vehiclename,   _vehiclename  );
+     // We increase the number of vehicles registered count
+      index++;
+      
+    return (_vehicleaddress,fibonaccistring);
+   
+   
+    }
+
+function GetVehicleDetailViaAddress  (address _vehicleaddress) external returns ( address _myvehicleaddress,   string myvehiclename, string mycartype, uint256  proposalindex, string pseudorandomnum,  string active ) {
+ 
+       require (registeredentitiesasddress[_vehicleaddreess]==_vehicleaddreess,  "Address is not registered, try registering");
+   
+   address myvehicleaddress = vehiclestore[_vehicleaddress].vehicleaddress;
+    string myvehiclename = vehiclestore[_vehicleaddress].vehiclename;
+    string mycartype = vehiclestore[_vehicleaddress].cartype;
+     uint256  proposalindex=  vehiclestore[_vehicleaddress].proposalindex;
+    string pseudorandomnum= vehiclestore[_vehicleaddress].pseudorandomnum;
+  
+    string active= vehiclestore[_vehicleaddress].active;
+
+      emit GetVehicleDetailViaAddressEvent(myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
+ 
+      
+    return (myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
+   
+   
+    }
+function GetVehicleDetailViaPseudonymn  (address _pseudorandomnum) external returns ( address _myvehicleaddress,   string myvehiclename, string mycartype, uint256  proposalindex, string pseudorandomnum,  string active  ) {
+  
+               require (registeredentitiespseudonymlist[_vehicleaddreess]==_pseudorandomnum,  "Address is not registered, try registering");
+   
+   address myvehicleaddress = vehiclestore[_vehicleaddress].vehicleaddress;
+    string myvehiclename = vehiclestore[_vehicleaddress].vehiclename;
+    string mycartype = vehiclestore[_vehicleaddress].cartype;
+     uint256  proposalindex=  vehiclestore[_vehicleaddress].proposalindex;
+    string pseudorandomnum= vehiclestore[_vehicleaddress].pseudorandomnum;
+  
+    string active= vehiclestore[_vehicleaddress].active;
+
+      emit GetVehicleDetailViaPseudonymnEvent(myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
+ 
+      
+    return (myvehicleaddress,myvehiclename,mycartype, proposalindex, pseudorandomnum,active);
+ 
+  
+   
+   
+    }
+
+function GetAllRegisteredAddress () external returns (address[] vehicleaddresses) {
+   address[] alladdresses =  registeredentitiesasddress;
+
+             
+      emit GetAllAddressesEvent(alladdresses);
+ 
+      
+    return (alladdresses);
+ 
+  
+   
+   
+    }
+function GetAllPseudonymAddress () external returns (address[] vehicleaddresses) {
+   address[] pseudonym =  registeredentitiesasddress;
+
+             
+      emit GetAllPseudonymEvent(alladdresses);
+ 
+      
+    return (alladdresses);
+ 
+     }
+
+//Revoke
+//
+
+function CheckIfVehicleExistsViaAddress  (address _vehicleaddreess) external returns (bool existent ) {
+      require (registeredentitiesasddress[_vehicleaddreess]==_vehicleaddreess,  "Address is not registered, try registering");
+    bool  _existent = true;   
+      
+    return (_existent);
+   
+   
+    }
+function CheckIfVehicleExistsViaPseudonym  (string _pseudorandomnum) external returns (bool existent ) {
+      require (registeredentitiespseudonymlist[_vehicleaddreess]==_pseudorandomnum,  "Address is not registered, try registering");
+    bool  _existent = true;   
+      
+    return (_existent);
+   
+   
+    }
+// From sender to payee here  
+function payfee( address payable sender, uint256 amount) external payable returns(bool, bytes memory){
+// Call returns a boolean value indicating success or failure.
+// This is the current recommended method to use.
+ 
+require ( amount >= 1, "Amount not enough to play!");
+
+// (bool sent, bytes memory data) = msg.sender.call{value: _payfee}("");
+//   require(sent, "Failed to send Ether");
+//This is the address to send to
+(bool success,bytes memory data ) = sender.call{value: amount}("");
+require(success, "Check the amount sent as well"); 
+
+return (success,data);
+}
+
+
+
+
+
+
+ function compare(string memory _a, string memory _b) public returns (int) {
+        bytes memory a = bytes(_a);
+        bytes memory b = bytes(_b);
+        uint minLength = a.length;
+        if (b.length < minLength) minLength = b.length;
+       
+        for (uint i = 0; i < minLength; i ++)
+            if (a[i] < b[i])
+                return -1;
+            else if (a[i] > b[i])
+                return 1;
+        if (a.length < b.length)
+            return -1;
+        else if (a.length > b.length)
+            return 1;
+        else
+            return 0;
+    }
+  
+    function equal(string memory _a, string memory _b) public returns (bool) {
+        return compare(_a, _b) == 0;
+    }
+
+function bytesToString(bytes memory byteCode) public pure returns(string memory stringData)
+{
+    uint256 blank = 0; 
+    uint256 length = byteCode.length;
+
+    uint cycles = byteCode.length / 0x20;
+    uint requiredAlloc = length;
+
+    if (length % 0x20 > 0) //optimise copying the final part of the bytes - to avoid looping with single byte writes
+    {
+        cycles++;
+        requiredAlloc += 0x20; //expand memory to allow end blank, so we don't smack the next stack entry
+    }
+
+    stringData = new string(requiredAlloc);
+
+    //copy data in 32 byte blocks
+    assembly {
+        let cycle := 0
+
+        for
+        {
+            let mc := add(stringData, 0x20) //pointer into bytes we're writing to
+            let cc := add(byteCode, 0x20)   //pointer to where we're reading from
+        } lt(cycle, cycles) {
+            mc := add(mc, 0x20)
+            cc := add(cc, 0x20)
+            cycle := add(cycle, 0x01)
+        } {
+            mstore(mc, mload(cc))
+        }
+    }
+
+    //finally blank final bytes and shrink size (part of the optimisation to avoid looping adding blank bytes1)
+    if (length % 0x20 > 0)
+    {
+        uint offsetStart = 0x20 + length;
+        assembly
+        {
+            let mc := add(stringData, offsetStart)
+            mstore(mc, mload(add(blank, 0x20)))
+            //now shrink the memory back so the returned object is the correct size
+            mstore(stringData, length)
+        }
+    }
+}
+   event getSafeAddressListEvent(string[] indexed  safeaddresskey);
+
+     function  getSafeAddresses(address  walletaddress)   external returns (string memory safeaddressgivenkey)  {
+        require (addresscheck[walletaddress]==walletaddress,  "Address is not stored in safe");
+         uint256 index =0; 
+         uint secindex =0;
+           string memory safeaddreesslist;
+           
+
+          bytes memory bytifiedwalletaddress = abi.encodePacked(walletaddress);
+     string memory stringifiedaddressforwallet = bytesToString(bytifiedwalletaddress);
+
+            for (index = 0; index <= multiwalletlist.length; index++  ){
+                if(equal(multiwalletlist[index][0],stringifiedaddressforwallet) == true){
+              
+               safeaddreesslist =  multiwalletlist[index][1];
+               safeaddressarray.push(safeaddreesslist);
+               
+            
+             emit getSafeAddressListEvent (safeaddressarray);
+             }
+              return (safeaddreesslist); 
+
+     }  
+
+     }
+}
