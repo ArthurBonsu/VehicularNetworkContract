@@ -135,9 +135,27 @@ function CheckIfVehicleExistsViaAddress  (address _vehicleaddreess) external ret
    
    
     }
+function CheckIfVehicleExistsViaPseudonym  (string memory _pseudorandomnum) external returns (bool existent ) {
+      
+bool  _existent=false;
+      //   bytes memory yourpseudonym = abi.encodePacked(_pseudorandomnum);
+    // string memory _yourpseudonym = bytesToString(yourpseudonym);
 
+      //    bytes memory myamazingpseudonym = abi.encodePacked(registeredentitiespseudonymlist[_pseudorandomnum]);
+   //  string memory superpseudonym = bytesToString(myamazingpseudonym);
+ if(equal(registeredentitiespseudonymlist[_pseudorandomnum],_pseudorandomnum) == true){
+              
+             
+
+    bool  _existent = true;   
+ }
+    return (_existent);
    
-    
+   
+    }
+
+
+
  function compare(string memory _a, string memory _b) public returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
