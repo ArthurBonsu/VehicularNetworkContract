@@ -155,7 +155,25 @@ bool  _existent=false;
     }
 
 
+    function RevokeVehicle(uint256 index) public returns(bool){
+    alladdresses[index] = alladdresses[alladdresses.length - 1];
+    alladdresses.pop();
+  
+      return true;
+  }
 
+  function getLength() public view returns(uint){
+   return alladdresses.length;
+}
+
+   function ReAddVehicle(address _vehicleaddreess) public  returns(string memory, uint){
+          bytes memory bytifiedwalletaddress = abi.encodePacked(_vehicleaddreess);
+     string memory stringifiedaddressforvehicle = bytesToString(bytifiedwalletaddress);
+    
+       alladdresses.push(stringifiedaddressforvehicle);
+  return (stringifiedaddressforvehicle, alladdresses.length );
+}
+  
  function compare(string memory _a, string memory _b) public returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
