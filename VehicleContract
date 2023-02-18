@@ -30,7 +30,8 @@ mapping(address =>  string ) public  prevrevokedlist;
  mapping(address => Vehicle) public vehiclelist;
 
  string[] alladdresses;
- string[] allpseudonymstring;
+ string[] allmypseudonyms;
+ string[][] allpseudonymstring;
 
 event registrationevent(address indexed vehicleaddress, string indexed  vehiclename, string indexed  cartype);
 
@@ -64,13 +65,17 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
       vehiclelist[_vehicleaddress].proposalindex=index;
      vehiclelist[_vehicleaddress].pseudorandomnum=fibonaccistring;
      vehiclelist[_vehicleaddress].active= true;
-      alladdresses.push(_vehicleaddress);
-      allpseudonymstring.push (fibonaccistring);
-     vehiclestore.push(vehiclenode);
+     
+        bytes memory bytifiedwalletaddress = abi.encodePacked(_vehicleaddress);
+     string memory stringifiedaddressforvehicle = bytesToString(bytifiedwalletaddress);
+      allpseudonymstring.push ([stringifiedaddressforvehicle,fibonaccistring]);
+
+      
+      vehiclestore.push(vehiclenode);
     // We store the pseudorandom value as well
     registeredentitiespseudonymlist[fibonaccistring] = fibonaccistring;
-      
-
+      alladdresses[index]=stringifiedaddressforvehicle;
+      allmypseudonyms[index]=fibonaccistring;
       // Events logged on the blockchain
       emit registrationevent( _vehicleaddress,   _vehiclename,   _vehiclename  );
      // We increase the number of vehicles registered count
@@ -103,12 +108,8 @@ function GetVehicleDetailViaAddress  (address _vehicleaddress) external returns 
 
 
 
-function GetAllRegisteredAddress () external returns (address memory vehicleaddresses) {
-   address[]  alladdresses =  registeredentitiesasddress;
-
-          
-      emit GetAllAddressesEvent(alladdresses);
- 
+function GetAllRegisteredAddress () external returns (string[] memory _alladdresses) {
+  
       
     return (alladdresses);
  
@@ -116,12 +117,10 @@ function GetAllRegisteredAddress () external returns (address memory vehicleaddr
    
    
     }
-function GetAllPseudonymAddress () external returns (address[] calldata allpseudonymnstrings) {
-   address[] calldata pseudonym =  registeredentitiesasddress;
-        
-  emit  GetAllPseudonymAddressEvent  (pseudonym);
+function GetAllPseudonymAddress () external returns (string[] memory _allpseudonymnstrings) {
+
       
-    return (pseudonym);
+    return (allmypseudonyms);
  
      }
 
@@ -136,15 +135,9 @@ function CheckIfVehicleExistsViaAddress  (address _vehicleaddreess) external ret
    
    
     }
-function CheckIfVehicleExistsViaPseudonym  (string calldata _pseudorandomnum) external returns (bool existent ) {
-     
-    require (registeredentitiespseudonymlist[_pseudorandomnum]==_pseudorandomnum,  "Address is not registered, try registering");
-    bool  _existent = true;   
-      
-    return (_existent);
+
    
-   
-    }
+    
  function compare(string memory _a, string memory _b) public returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
