@@ -24,15 +24,7 @@ mapping(address => mapping(uint256 => uint256)) multipayments;
 mapping(uint256 => bool) usedNonces;
  
 
- string[] allvipaddresses;
- string[] allproposaladddresses;
- string[][] vipandproposaladdress;
 
-event VIPEvent(address indexed vipaddress, string indexed  vipname, uint256 indexed  numberofproposal);
-
-event ProposalEvent( uint256  proposalid,string  proposalname, string  proposalreason, address  persontoberemoved, address submitter, address intendedVIP );
-event GetAllPseudonymAddressEvent (address[] indexed allpseudonymnstrings);
-event GetAllAddressesEvent(address[] indexed vehicleaddresses);
 
   // THIS FUNCTION IS CALLED BY INDUSTRY; HE CLAIMS GOOD AFTER EXCHANGE;
         //ACTUALLY CURRENT OWNER IS THE RECEIPIENT ADDRESS WHILE RECEIPIENTADDRESS IS THE SENDER ADDRESS, CAPICHE?
