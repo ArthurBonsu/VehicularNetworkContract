@@ -10,8 +10,7 @@ pragma solidity 0.8.2;
 
 //Finabocci, signing, blocktimestamp 
 
-uint256 randNonce =0;
-uint256 modulus =0;
+
 
 contract VIPContract 
  {
@@ -30,36 +29,36 @@ contract VIPContract
     //  string[] public safeaddressarray;
 
        struct Proposals {      
-        string  proposalid;  
+        uint256  proposalid;  
         string  proposalname;     
         string  proposalreason; 
         address  persontoberemoved;
         address submitter;
         address intendedVIP;  
-        address intendedKCC; 
         
       }
-        
+        uint256 randNonce =0;
+       uint256 modulus =0;
    
       Proposals Proposalnode;
       Proposals[] public Proposalstores;
 
 
 mapping(address => address) public registeredvipaddress;
-mapping(string =>  string ) public  proposalidgenerated;
+mapping(uint256 =>  uint256 ) public  proposalidgenerated;
 
-mapping(address => mapping(string => uint256)) paidpeople;
+mapping(address => mapping(uint256 => uint256)) paidpeople;
 mapping(address =>  string ) public  updatedpeoplelist;
  mapping(address => VIP) public viplist;
-  mapping(string => Proposals) public proplist;
+  mapping(uint256 => Proposals) public proplist;
 
  string[] allvipaddresses;
  string[] allproposaladddresses;
  string[][] vipandproposaladdress;
 
-event registrationevent(address indexed vipaddress, string indexed  vipname, string indexed  numberofproposal);
+event VIPEvent(address indexed vipaddress, string indexed  vipname, uint256 indexed  numberofproposal);
 
-event ProposalEvent( string  proposalid,string  proposalname, string  proposalreason, address  persontoberemoved, address submitter, address intendedVIP, address intendedKCC );
+event ProposalEvent( uint256  proposalid,string  proposalname, string  proposalreason, address  persontoberemoved, address submitter, address intendedVIP );
 event GetAllPseudonymAddressEvent (address[] indexed allpseudonymnstrings);
 event GetAllAddressesEvent(address[] indexed vehicleaddresses);
 
@@ -79,7 +78,7 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
       // We store the vehicle nodes on the blockchain and set it as registered with details
    
 
-    vipnode =VIP(_vipaddress,_vipname, 0 );
+    vipnode =VIP(_vipaddress,_vipname, 0 , true);
      viplist[_vipaddress].vipaddress=_vipaddress;
      viplist[_vipaddress].vipname=_vipname;
      viplist[_vipaddress].numberofproposals=0;
@@ -99,7 +98,7 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
       allvipaddresses[index]=stringedvip;
 
       // Events logged on the blockchain
-      emit registrationevent( _vipaddress,_vipname, 0);
+      emit VIPEvent( _vipaddress,_vipname, index);
      // We increase the number of vehicles registered count
       index++;
       
@@ -108,8 +107,8 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
    
     }
  
-function SendProposal  (string proposalname, string proposalreason, address persontoberemoved, address submitter,
-        address  intendedVIP, address intendedKCC ) external returns ( string _proposalid, string _proposalname,  string _proposalreason, address  _persontoberemoved,  address _submitter,   address  _intendedVIP, address _intendedKCC ) {
+function SendProposal  (string memory  proposalname, string memory proposalreason, address persontoberemoved, address submitter,
+        address  intendedVIP ) external returns (uint256 _proposalid, string memory  _proposalname,  string memory _proposalreason, address  _persontoberemoved,  address _submitter,   address  _intendedVIP ) {
  
    uint256 proposalindex =0;
 
@@ -119,7 +118,7 @@ shuffler= 100000000;
 
 // We set a random number, well there has to be a better way of doing this thing
 randNonce++; 
-string proposalidgiven =     uint256(keccak256(abi.encodePacked(block.timestamp,
+uint256 proposalidgiven =     uint256(keccak256(abi.encodePacked(block.timestamp,
 msg.sender,
 randNonce))) % 
 shuffler; 
@@ -128,22 +127,22 @@ shuffler;
     proposalidgenerated[proposalidgiven]==proposalidgiven;
    
 
-Proposalnode = Proposals(proposalidgiven, proposalname,proposalreason,persontoberemoved, submitter, intendedVIP, intendedKCC );
-   string  myproposalid = proplist[proposalidgiven].proposalid;
+Proposalnode = Proposals(proposalidgiven, proposalname,proposalreason,persontoberemoved, submitter, intendedVIP );
+   uint256  myproposalid = proplist[proposalidgiven].proposalid;
     string memory myproposalname = proplist[proposalidgiven].proposalname;
-    address  myproposalreason = proplist[proposalidgiven].proposalreason;
-     address  mypersontoberemoved = proplist[proposalidgiven].proposalreason;
+    string memory  myproposalreason = proplist[proposalidgiven].proposalreason;
+     address  mypersontoberemoved = proplist[proposalidgiven].persontoberemoved;
     address mysubmitter=  proplist[proposalidgiven].submitter;
     address myintendedVIP= proplist[proposalidgiven].intendedVIP;
-      address myintendedKCC=  proplist[proposalidgiven].intendedKCC;
+     
              
   
-  
+       Proposalstores.push(Proposalnode);
 
-      emit ProposalEvent(myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedVIP,myintendedKCC);
+      emit ProposalEvent(myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedVIP);
  proposalindex++;
       
-    return (myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedVIP,myintendedKCC );
+    return (myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedVIP );
    
    
     }
@@ -157,25 +156,25 @@ function NotifyKCC (address _kcc) external returns (address, bool) {
  
       }
 
-function Payfees (address VIP, address _vehicle, uint256 _amountpaid  ) external returns (address, address,string, uint256) {
-           string recordeddate = block.timestamp; 
+function Payfees (address VIP, address _vehicle, uint256 _amountpaid  ) external returns (address, address,uint256, uint256) {
+     uint256 recordeddate = block.timestamp; 
       paidpeople[_vehicle][recordeddate]=_amountpaid; 
-    return (VIP,_vehicle, _amountpaid );
+    return (VIP,_vehicle,recordeddate,  _amountpaid );
  
      }
 
 //Revoke
 //
 
-function CheckIfVIPExists (address _vehicleaddreess) external returns (bool existent ) {
-      require (registeredentitiesasddress[_vehicleaddreess]==_vehicleaddreess,  "Address is not registered, try registering");
+function CheckIfVIPExists (address _VIPaddress) external returns (bool existent ) {
+      require (registeredvipaddress[_VIPaddress]==_VIPaddress,  "Address is not registered, try registering");
     bool  _existent = true;   
       
     return (_existent);
    
    
     }
-function CheckIfVehicleExistsViaPseudonym  (string memory _pseudorandomnum) external returns (bool existent ) {
+function CheckIfProposalExists (uint256 _proposalid) external returns (bool existent ) {
       
 bool  _existent=false;
       //   bytes memory yourpseudonym = abi.encodePacked(_pseudorandomnum);
@@ -183,12 +182,12 @@ bool  _existent=false;
 
       //    bytes memory myamazingpseudonym = abi.encodePacked(registeredentitiespseudonymlist[_pseudorandomnum]);
    //  string memory superpseudonym = bytesToString(myamazingpseudonym);
- if(equal(registeredentitiespseudonymlist[_pseudorandomnum],_pseudorandomnum) == true){
+require (proposalidgenerated[_proposalid] == _proposalid) ;
               
              
 
-    bool  _existent = true;   
- }
+     _existent = true;   
+ 
     return (_existent);
    
    
