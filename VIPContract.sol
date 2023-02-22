@@ -9,10 +9,11 @@ pragma solidity 0.8.2;
 //ReceiveFee
 
 //Finabocci, signing, blocktimestamp 
+import "./VehiclePayment.sol";
+import "./VehicleContract.sol";
 
 
-
-contract VIPContract 
+contract VIPContract is  VehiclePayment, VehicleContract
  {
         
         struct VIP {      
@@ -59,8 +60,7 @@ mapping(address =>  string ) public  updatedpeoplelist;
 event VIPEvent(address indexed vipaddress, string indexed  vipname, uint256 indexed  numberofproposal);
 
 event ProposalEvent( uint256  proposalid,string  proposalname, string  proposalreason, address  persontoberemoved, address submitter, address intendedVIP );
-event GetAllPseudonymAddressEvent (address[] indexed allpseudonymnstrings);
-event GetAllAddressesEvent(address[] indexed vehicleaddresses);
+
 
 
 
@@ -192,7 +192,15 @@ require (proposalidgenerated[_proposalid] == _proposalid) ;
    
    
     }
- function compare(string memory _a, string memory _b) public returns (int) {
+
+   //revokerepvehicle
+// register vehiclke
+// function payment
+    function registerVehicle(address _vehicleaddress, string memory _vehiclename, string memory _cartype  )  public returns (bool) {
+   VehicleContract.Registration (_vehicleaddress,_vehiclename,_cartype ) ;
+        return true; 
+    }
+ function compare(string memory _a, string memory _b) public override returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
         uint minLength = a.length;
@@ -211,11 +219,11 @@ require (proposalidgenerated[_proposalid] == _proposalid) ;
             return 0;
     }
   
-    function equal(string memory _a, string memory _b) public returns (bool) {
+    function equal(string memory _a, string memory _b) public override  returns (bool) {
         return compare(_a, _b) == 0;
     }
 
-function bytesToString(bytes memory byteCode) public pure returns(string memory stringData)
+function bytesToString(bytes memory byteCode) public pure override returns(string memory stringData)
 {
     uint256 blank = 0; 
     uint256 length = byteCode.length;
