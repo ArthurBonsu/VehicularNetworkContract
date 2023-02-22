@@ -3,7 +3,10 @@
 
 pragma solidity 0.8.2;
 
-
+// Bidding
+//Fabioni
+//Payments
+//Clustering
 contract VehicleContract 
  {
         
@@ -25,7 +28,7 @@ contract VehicleContract
 
 mapping(address => address) public registeredentitiesasddress;
 mapping(string =>  string ) public  registeredentitiespseudonymlist;
-mapping(address =>  string ) public  revokedlist;
+mapping(address =>  address ) public  revokedlist;
 mapping(address =>  string ) public  prevrevokedlist;
  mapping(address => Vehicle) public vehiclelist;
 
@@ -157,10 +160,12 @@ bool  _existent=false;
 
     function RevokeVehicle(uint256 index) public returns(bool){
     alladdresses[index] = alladdresses[alladdresses.length - 1];
+   
     alladdresses.pop();
   
       return true;
   }
+
 
   function getLength() public view returns(uint){
    return alladdresses.length;
@@ -174,7 +179,17 @@ bool  _existent=false;
   return (stringifiedaddressforvehicle, alladdresses.length );
 }
   
- function compare(string memory _a, string memory _b) public returns (int) {
+  function revokebyaddress (address _vehicleaddress) public returns (address ) {
+       delete registeredentitiesasddress[_vehicleaddress];
+     uint256 myindex =    vehiclelist[_vehicleaddress].proposalindex;
+      RevokeVehicle(myindex) ;
+      return( _vehicleaddress);
+  
+  }
+
+
+
+ function compare(string memory _a, string memory _b) public virtual returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
         uint minLength = a.length;
@@ -193,11 +208,11 @@ bool  _existent=false;
             return 0;
     }
   
-    function equal(string memory _a, string memory _b) public returns (bool) {
+    function equal(string memory _a, string memory _b) public virtual  returns (bool) {
         return compare(_a, _b) == 0;
     }
 
-function bytesToString(bytes memory byteCode) public pure returns(string memory stringData)
+function bytesToString(bytes memory byteCode) public virtual pure returns(string memory stringData)
 {
     uint256 blank = 0; 
     uint256 length = byteCode.length;
