@@ -7,19 +7,20 @@ pragma solidity 0.8.2;
 //GetAll
 //Check if they exist
 //ReceiveFee
+//submissions are encrrypted 
 
 //Finabocci, signing, blocktimestamp 
 import "./VehiclePayment.sol";
 import "./VehicleContract.sol";
 
 
-contract KGCContract is  VehiclePayment
+contract KGCContract is  VehiclePayment, VehicleContract
  {
         
         struct KGC {      
         address  kgcaddress;  
         string  kgcname;     
-        uint256  numberofproposals;   
+        uint256  numberoffeedbacks;   
         bool active;      
       }
          
@@ -29,39 +30,38 @@ contract KGCContract is  VehiclePayment
     //  string [][] public multiwalletlist ;
     //  string[] public safeaddressarray;
 
-       struct Proposals {      
-        uint256  proposalid;  
-        string  proposalname;     
-        string  proposalreason; 
+       struct feedbacks {      
+        uint256  feedbackid;  
+          
+        string  feedbackreason; 
         address  persontoberemoved;
         address submitter;
-        address intendedKGC;  
+        address intendedVIP;  
         
       }
         uint256 randNonce =0;
        uint256 modulus =0;
    
-      Proposals Proposalnode;
-      Proposals[] public Proposalstores;
+      feedbacks feedbacknode;
+      feedbacks[] public feedbackstores;
 
 
 mapping(address => address) public registeredkgcaddress;
-mapping(uint256 =>  uint256 ) public  proposalidgenerated;
+mapping(uint256 =>  uint256 ) public  feedbackidgenerated;
 
 mapping(address => mapping(uint256 => uint256)) paidpeople;
 mapping(address =>  string ) public  updatedpeoplelist;
  mapping(address => KGC) public KGClist;
-  mapping(uint256 => Proposals) public proplist;
+  mapping(uint256 => feedbacks) public proplist;
 
  string[] allkgcaddresses;
- string[] allproposaladddresses;
- string[][] KGCandproposaladdress;
+ string[] allfeedbackadddresses;
+ string[][] KGCandfeedbackaddress;
 
-event KGCEvent(address indexed kgcaddress, string indexed  kgcname, uint256 indexed  numberofproposal);
+event KGCEvent(address indexed kgcaddress, string indexed  kgcname, uint256 indexed  numberoffeedback);
 
-event ProposalEvent( uint256  proposalid,string  proposalname, string  proposalreason, address  persontoberemoved, address submitter, address intendedKGC );
-event GetAllPseudonymAddressEvent (address[] indexed allpseudonymnstrings);
-event GetAllAddressesEvent(address[] indexed vehicleaddresses);
+event feedbackEvent( uint256  feedbackid, string  feedbackreason, address  persontoberemoved, address submitter, address intendedVIP );
+
 
 
 
@@ -82,7 +82,7 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
     KGCnode =KGC(_kgcaddress,_kgcname, 0 , true);
      KGClist[_kgcaddress].kgcaddress=_kgcaddress;
      KGClist[_kgcaddress].kgcname=_kgcname;
-     KGClist[_kgcaddress].numberofproposals=0;
+     KGClist[_kgcaddress].numberoffeedbacks=0;
      KGClist[_kgcaddress].active=true;
   
      
@@ -108,10 +108,10 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
    
     }
  
-function SendProposal  (string memory  proposalname, string memory proposalreason, address persontoberemoved, address submitter,
-        address  intendedKGC ) external returns (uint256 _proposalid, string memory  _proposalname,  string memory _proposalreason, address  _persontoberemoved,  address _submitter,   address  _intendedKGC ) {
+function Sendfeedback  ( string memory feedbackreason, address persontoberemoved, address submitter,
+        address  intendedVIP ) external returns (uint256 _feedbackid,   string memory _feedbackreason, address  _persontoberemoved,  address _submitter,   address  _intendedVIP ) {
  
-   uint256 proposalindex =0;
+   uint256 feedbackindex =0;
 
 // We set a shuffler to generate a random number    
 uint256 shuffler = 0;
@@ -119,50 +119,38 @@ shuffler= 100000000;
 
 // We set a random number, well there has to be a better way of doing this thing
 randNonce++; 
-uint256 proposalidgiven =     uint256(keccak256(abi.encodePacked(block.timestamp,
+uint256 feedbackidgiven =     uint256(keccak256(abi.encodePacked(block.timestamp,
 msg.sender,
 randNonce))) % 
 shuffler; 
 
     
-    proposalidgenerated[proposalidgiven]==proposalidgiven;
+    feedbackidgenerated[feedbackidgiven]==feedbackidgiven;
    
 
-Proposalnode = Proposals(proposalidgiven, proposalname,proposalreason,persontoberemoved, submitter, intendedKGC );
-   uint256  myproposalid = proplist[proposalidgiven].proposalid;
-    string memory myproposalname = proplist[proposalidgiven].proposalname;
-    string memory  myproposalreason = proplist[proposalidgiven].proposalreason;
-     address  mypersontoberemoved = proplist[proposalidgiven].persontoberemoved;
-    address mysubmitter=  proplist[proposalidgiven].submitter;
-    address myintendedKGC= proplist[proposalidgiven].intendedKGC;
+feedbacknode = feedbacks(feedbackidgiven, feedbackreason,persontoberemoved, submitter, intendedVIP );
+   uint256  myfeedbackid = proplist[feedbackidgiven].feedbackid;
+   
+    string memory  myfeedbackreason = proplist[feedbackidgiven].feedbackreason;
+     address  mypersontoberemoved = proplist[feedbackidgiven].persontoberemoved;
+    address mysubmitter=  proplist[feedbackidgiven].submitter;
+    address myintendedVIP= proplist[feedbackidgiven].intendedVIP;
      
              
   
-       Proposalstores.push(Proposalnode);
+       feedbackstores.push(feedbacknode);
 
-      emit ProposalEvent(myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedKGC);
- proposalindex++;
+      emit feedbackEvent(myfeedbackid,myfeedbackreason, mypersontoberemoved, mysubmitter,myintendedVIP);
+ feedbackindex++;
       
-    return (myproposalid,myproposalname,myproposalreason, mypersontoberemoved, mysubmitter,myintendedKGC );
+    return (myfeedbackid,myfeedbackreason, mypersontoberemoved, mysubmitter,myintendedVIP );
    
    
     }
 
 
 
-function NotifyKCC (address _kcc) external returns (address, bool) {
-  
-      bool notified = true;
-    return (_kcc, notified);
- 
-      }
 
-function Payfees (address KGC, address _vehicle, uint256 _amountpaid  ) external returns (address, address,uint256, uint256) {
-     uint256 recordeddate = block.timestamp; 
-      paidpeople[_vehicle][recordeddate]=_amountpaid; 
-    return (KGC,_vehicle,recordeddate,  _amountpaid );
- 
-     }
 
 //Revoke
 //
@@ -175,33 +163,17 @@ function CheckIfKGCExists (address _kgcaddress) external returns (bool existent 
    
    
     }
-function CheckIfProposalExists (uint256 _proposalid) external returns (bool existent ) {
-      
-bool  _existent=false;
-      //   bytes memory yourpseudonym = abi.encodePacked(_pseudorandomnum);
-    // string memory _yourpseudonym = bytesToString(yourpseudonym);
 
-      //    bytes memory myamazingpseudonym = abi.encodePacked(registeredentitiespseudonymlist[_pseudorandomnum]);
-   //  string memory superpseudonym = bytesToString(myamazingpseudonym);
-require (proposalidgenerated[_proposalid] == _proposalid) ;
-              
-             
-
-     _existent = true;   
- 
-    return (_existent);
-   
-   
-    }
 
    //revokerepvehicle
 // register vehiclke
 // function payment
-    function  revokeReportedVehicle(address  )  public returns (int) {
-   
-
+    function  revokeReportedVehicle(address _reportedvehicle  )  public returns (bool) {
+    address receivedrevokedvehicle =    VehicleContract.revokebyaddress (_reportedvehicle);
+      require (receivedrevokedvehicle ==_reportedvehicle );
+      return true; 
     }
- function compare(string memory _a, string memory _b) public returns (int) {
+ function compare(string memory _a, string memory _b) public override  returns (int) {
         bytes memory a = bytes(_a);
         bytes memory b = bytes(_b);
         uint minLength = a.length;
@@ -220,11 +192,11 @@ require (proposalidgenerated[_proposalid] == _proposalid) ;
             return 0;
     }
   
-    function equal(string memory _a, string memory _b) public returns (bool) {
+    function equal(string memory _a, string memory _b) public override returns (bool) {
         return compare(_a, _b) == 0;
     }
 
-function bytesToString(bytes memory byteCode) public pure returns(string memory stringData)
+function bytesToString(bytes memory byteCode) public override pure returns(string memory stringData)
 {
     uint256 blank = 0; 
     uint256 length = byteCode.length;
