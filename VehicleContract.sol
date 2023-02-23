@@ -44,7 +44,7 @@ event GetAllAddressesEvent(address[] indexed vehicleaddresses);
 
 
 
-    function Registration (address _vehicleaddress, string memory _vehiclename, string memory _cartype ) external returns (address, string memory  ) {
+    function vehicleregistration (address _vehicleaddress, string memory _vehiclename, string memory _cartype ) public returns (address, string memory  ) {
       uint256 index=0;
       
       // We set it amoong the registered hashmaps
@@ -117,7 +117,6 @@ function GetAllRegisteredAddress () external returns (string[] memory _alladdres
     return (alladdresses);
  
   
-   
    
     }
 function GetAllPseudonymAddress () external returns (string[] memory _allpseudonymnstrings) {
