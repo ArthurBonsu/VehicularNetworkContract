@@ -197,7 +197,7 @@ require (proposalidgenerated[_proposalid] == _proposalid) ;
 // register vehiclke
 // function payment
     function registerVehicle(address _vehicleaddress, string memory _vehiclename, string memory _cartype  )  public returns (bool) {
-   VehicleContract.Registration (_vehicleaddress,_vehiclename,_cartype ) ;
+    VehicleContract.vehicleregistration (_vehicleaddress,_vehiclename,_cartype ) ;
         return true; 
     }
  function compare(string memory _a, string memory _b) public override returns (int) {
